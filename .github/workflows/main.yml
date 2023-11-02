@@ -1,95 +1,19 @@
-
-    $headers = @{}
-
-
- 
-
-
-    $headers.Add("AccessKey","pX4A1gON98SDXXsq")
-
-
- 
-
-
-    $runScheduleId = "a47fc5f1-0611-419d-a8c4-c438d708d821"
-
-
- 
-
-
-    $runNow = Invoke-WebRequest -Method PUT -ContentType "application/json" -UseBasicParsing -Headers $headers "http://localhost:9001/api/v4/schedules/$runScheduleId/runNow?TEST_VALUE='ABC'"
-
-
- 
-
-
-    Write-Host "Result:  " $runNow
-
-
- 
-
-
-    if ($runNow.StatusCode -ne 200) { throw "Could not run schedule." }
-
-
- 
-
-
-    $runNowResponse=$runNow.Content | ConvertFrom-Json
-
-
- 
-
-
-    $runId=$runNowResponse.RunId
-
-
- 
-
-
-    # Get the result, keep polling every 5 seconds until a new result is returned.
-
-
- 
-
-
-    do
-
-
- 
-
-
-    {
-      Start-Sleep -Seconds 5
-      Write-Host "Polling for run results. Runid=" $runId
-      $runResult = Invoke-WebRequest -ContentType "application/json" -UseBasicParsing -Headers $headers "http://localhost:9001/api/v4/run/$runId" | ConvertFrom-Json
-    }
-
-
- 
-
-
-    while ($runResult.Status -ne 'Finished')
-
-
- 
-
-
-    Write-Host "Results received."
-
-
- 
-
-
-    #Invoke-WebRequest -ContentType "application/json" -Headers $headers "http://vmctrl01.westeurope.cloudapp.azure.com:9001/api/v4/variables/c012e4ff-7c98-4dd1-91c2-ed403060ba78" | ConvertFrom-Json
-
-
- 
-
-
-    Write-Host "Run Result:" $runResult
-
-
-
-
+$headers = @{}
+$headers.Add("AccessKey","pX4A1gON98SDXXsq")
+$runScheduleId = "a47fc5f1-0611-419d-a8c4-c438d708d821"
+$runNow = Invoke-WebRequest -Method PUT -ContentType "application/json" -UseBasicParsing -Headers $headers "http://localhost:9001/api/v4/schedules/$runScheduleId/runNow?TEST_VALUE='ABC'"
+Write-Host "Result:  " $runNow
+if ($runNow.StatusCode -ne 200) { throw "Could not run schedule." }
+$runNowResponse=$runNow.Content | ConvertFrom-Json
+$runId=$runNowResponse.RunId
+do
+  {
+    Start-Sleep -Seconds 5
+    Write-Host "Polling for run results. Runid=" $runId
+    $runResult = Invoke-WebRequest -ContentType "application/json" -UseBasicParsing -Headers $headers "http://localhost:9001/api/v4/run/$runId" | ConvertFrom-Json
+  }
+while ($runResult.Status -ne 'Finished')
+Write-Host "Results received."
+#Invoke-WebRequest -ContentType "application/json" -Headers $headers "http://vmctrl01.westeurope.cloudapp.azure.com:9001/api/v4/variables/c012e4ff-7c98-4dd1-91c2-ed403060ba78" | ConvertFrom-Json
+Write-Host "Run Result:" $runResult
 # Useless Comment
